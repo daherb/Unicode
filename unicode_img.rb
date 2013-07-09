@@ -1,4 +1,4 @@
-require 'imlib2'
+require './lib/imlib2'
 require './unicode'
 class Unicode_img < Unicode
 
