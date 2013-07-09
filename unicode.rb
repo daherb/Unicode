@@ -5,7 +5,9 @@ class Unicode
     if number < 2 ** 7
       bytes.push number
     else
-      while number > (2 ** 5 - 1)
+      bytecount = 2
+      while number > (2 ** (8 - bytecount) - 1)
+        bytecount += 1
         #    puts "Number : " + number.to_s(2)
         byte = 2 ** 7 + (number & 2 ** 6 - 1)
         #    puts "Byte : " + byte.to_s(2)
