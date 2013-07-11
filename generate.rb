@@ -10,7 +10,6 @@ if ARGV.size < 2
 else
   if ARGV[0] == "-img"
     $u = Unicode_img.new
-#    $u.add_font_path '/usr/share/fonts'
     $u.init ARGV[1], 20, (11.7 * 600).to_i, (16.5 * 600).to_i
   elsif ARGV[0] == "-txt"
     $u = Unicode_txt.new
