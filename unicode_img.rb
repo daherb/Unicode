@@ -9,24 +9,24 @@ class Unicode_img < Unicode
   end
 
   def init(filename,fontsize,width,height)
-    fontpfad = '/media/Windows7/Windows/Fonts/'
-    Imlib2::Font.add_path fontpfad
+    fontpath = '/media/Windows7/Windows/Fonts/'
+    Imlib2::Font.add_path fontpath
     @fonts = Array.new
     @stats = Hash.new
     @fontlist = Imlib2::Font.list_fonts.select { |f| f.match(/^[a-zA-Z]/) } 
     @fontlist.each do |name|
-      if (File.exists?(fontpfad + name + ".ttf"))
-        fontdatei = fontpfad + name + ".ttf"
-      elsif (File.exists?(fontpfad + name + ".TTF"))
-        fontdatei = fontpfad + name + ".TTF"
+      if (File.exists?(fontpath + name + ".ttf"))
+        fontfile = fontpath + name + ".ttf"
+      elsif (File.exists?(fontpath + name + ".TTF"))
+        fontfile = fontpath + name + ".TTF"
       else
-        fontdatei = nil
+        fontfile = nil
       end
-      if (!fontdatei.nil?)
+      if (!fontfile.nil?)
         @fonts.push ( { 
                         "name" => name,
                         "imlib" => ( Imlib2::Font.new ( name + "/" + fontsize.to_s ) ) ,
-                        "ttfunk" => TTFunk::File.open(fontdatei)
+                        "ttfunk" => TTFunk::File.open(fontfile)
                       } )
       end
     end
