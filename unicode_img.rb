@@ -9,16 +9,26 @@ class Unicode_img < Unicode
   end
 
   def init(filename,fontsize,width,height)
-    Imlib2::Font.add_path './fonts' # Pathname.new('./fonts').realpath.to_s
+    fontpfad = '/media/Windows7/Windows/Fonts/'
+    Imlib2::Font.add_path fontpfad
     @fonts = Array.new
     @stats = Hash.new
-    @fontlist = ['code2000', 'code2001', 'code2002', 'arial', 'dejavu', 'jhendhei', 'unifont', 'sun-exta', 'sun-extb']
+    @fontlist = Imlib2::Font.list_fonts.select { |f| f.match(/^[a-zA-Z]/) } 
     @fontlist.each do |name|
-      @fonts.push ( { 
-                      "name" => name,
-                      "imlib" => ( Imlib2::Font.new ( name + "/" + fontsize.to_s ) ) ,
-                      "ttfunk" => TTFunk::File.open("./fonts/" + name + ".ttf")
-                    } )
+      if (File.exists?(fontpfad + name + ".ttf"))
+        fontdatei = fontpfad + name + ".ttf"
+      elsif (File.exists?(fontpfad + name + ".TTF"))
+        fontdatei = fontpfad + name + ".TTF"
+      else
+        fontdatei = nil
+      end
+      if (!fontdatei.nil?)
+        @fonts.push ( { 
+                        "name" => name,
+                        "imlib" => ( Imlib2::Font.new ( name + "/" + fontsize.to_s ) ) ,
+                        "ttfunk" => TTFunk::File.open(fontdatei)
+                      } )
+      end
     end
     @filename = filename
     @font_size = fontsize
@@ -45,29 +55,31 @@ class Unicode_img < Unicode
       @y += (1.5 * @font_size).to_i
     end
     code = s.unpack("U*").first
+    $stderr.print "0x" + code.to_s(16) + ":"
     @fonts.each do |font|
-      if (font["ttfunk"].cmap.unicode.first[code] != 0)
-        if (@prev == font["ttfunk"].cmap.unicode.first[code])
-          puts @prev
-        end
+      if (!font["ttfunk"].cmap.unicode.first.nil?)
+        if (font["ttfunk"].cmap.unicode.first[code] != 0)
+          if (@prev == font["ttfunk"].cmap.unicode.first[code])
+          end
         @prev = font["ttfunk"].cmap.unicode.first[code]
-        @img.draw_text font["imlib"], s, @x, @y, Imlib2::Color::BLACK
-        if (@stats[font["name"]].nil?)
-          @stats[font["name"]] = 1
+          @img.draw_text font["imlib"], s, @x, @y, Imlib2::Color::BLACK
+          if (@stats[font["name"]].nil?)
+            @stats[font["name"]] = 1
         else
-          @stats[font["name"]] += 1
-        end
-        break
-      else
-        if (@stats["none"].nil?)
+            @stats[font["name"]] += 1
+          end
+          break
+        else
+          if (@stats["none"].nil?)
           @stats["none"] = 1
-        else
-          @stats["none"] += 1
+          else
+            @stats["none"] += 1
+          end
         end
       end
     end
   end
-  
+
   def finish
     @img.save @filename
     puts @stats
